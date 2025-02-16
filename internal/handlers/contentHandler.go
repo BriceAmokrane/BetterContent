@@ -15,11 +15,12 @@ type ContentHandler struct {
 }
 
 func NewContentHandler(validator validators.URLValidator) *ContentHandler {
+	youtubeScraper, _ := scrapers.NewYoutubeScraper(os.Getenv("YOUTUBE_API_KEY"))
 	return &ContentHandler{
 		urlValidator: validator,
 		scrapers: map[string]scrapers.ContentScraper{
-			"youtube.com": scrapers.NewYoutubeScraper(),
-			"youtu.be":    scrapers.NewYoutubeScraper(),
+			"youtube.com": youtubeScraper,
+			"youtu.be":    youtubeScraper,
 		},
 	}
 }
