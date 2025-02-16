@@ -1,11 +1,29 @@
 package scrapers
 
-import "BetterContent/internal/types"
+import (
+	"BetterContent/internal/types"
+	"context"
+	"fmt"
+	"google.golang.org/api/option"
+	"google.golang.org/api/youtube/v3"
+	"regexp"
+)
 
-type YoutubeScraper struct{}
+type YoutubeScraper struct {
+	service *youtube.Service
+}
 
-func NewYoutubeScraper() ContentScraper {
-	return &YoutubeScraper{}
+func NewYoutubeScraper(apiKey string) (*YoutubeScraper, error) {
+	ctx := context.Background()
+	service, err := youtube.NewService(
+		ctx,
+		option.WithAPIKey(apiKey),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create YouTube service: %v", err)
+	}
+
+	return &YoutubeScraper{service: service}, nil
 }
 
 func (s *YoutubeScraper) Scrape(url string) (types.ContentData, error) {
