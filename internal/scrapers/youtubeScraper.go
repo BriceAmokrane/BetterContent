@@ -27,14 +27,35 @@ func NewYoutubeScraper(apiKey string) (*YoutubeScraper, error) {
 }
 
 func (s *YoutubeScraper) Scrape(url string) (types.ContentData, error) {
-	return &types.YoutubeContent{
+	// Extraction de l'ID de la vidéo depuis l'URL
+	videoID, err := extractVideoID(url)
+	if err != nil {
+		return nil, err
+	}
+
+	// Appel à l'API YouTube
+	call := s.service.Videos.List([]string{"snippet"}).Id(videoID)
+	response, err := call.Do()
+	if err != nil {
+		return nil, fmt.Errorf("error calling YouTube API: %v", err)
+	}
+
+	if len(response.Items) == 0 {
+		return nil, fmt.Errorf("no video found with ID: %s", videoID)
+	}
+
+	video := response.Items[0]
+	content := &types.YoutubeContent{
 		Content: types.Content{
 			URL:  url,
 			Type: "youtube",
 		},
-		Title:  "Dummy title",
-		Author: "Dummy author",
-	}, nil
+		Title:       video.Snippet.Title,
+		Author:      video.Snippet.ChannelTitle,
+		Description: video.Snippet.Description,
+	}
+
+	return content, nil
 }
 
 func extractVideoID(url string) (string, error) {
