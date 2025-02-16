@@ -20,6 +20,7 @@ func (c *Content) GetType() string {
 
 type YoutubeContent struct {
 	Content
-	Title  string // Video title
-	Author string // Channel name
+	Title       string // Video title
+	Author      string // Channel name
+	Description string // Video description
 }
